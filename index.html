@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="description" content="随机午餐大转盘，一键决定今天吃什么！可自愿领取外卖优惠入口。" />
+  <meta name="keywords" content="午餐,转盘,随机,美食,外卖优惠" />
+  <title>随机午餐大转盘</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <canvas id="particleCanvas"></canvas>
+
+  <div class="container">
+    <h1 class="title">🍽️ 今天吃什么？</h1>
+    <p class="subtitle">
+      每天中午纠结吃什么？点一下直接给答案（可选：结果页提供外卖优惠入口，自愿领取）。
+    </p>
+
+    <!-- 主按钮区 -->
+    <div class="button-area">
+      <button id="spinBtn" class="btn-primary" type="button">🎲 开始转动</button>
+      <button id="againBtn" class="btn-secondary" type="button" disabled>🔄 换一个结果</button>
+    </div>
+
+    <!-- 图一的三按钮：菜单目录 / 查看统计 / 清除数据 -->
+    <div class="tool-area">
+      <button id="menuBtn" class="btn-tool" type="button">📋 菜单目录</button>
+      <button id="statsBtn" class="btn-tool" type="button">📊 查看统计</button>
+      <button id="clearBtn" class="btn-tool btn-danger" type="button">🗑️ 清除数据</button>
+    </div>
+
+    <p class="tip-text">
+      *说明：本页为“午餐选择工具”。如你主动点击相关入口，将跳转第三方平台查看优惠信息；是否领券/下单以第三方页面为准。
+    </p>
+
+    <!-- 转盘 -->
+    <div class="wheel-container">
+      <canvas id="wheelCanvas" aria-label="午餐转盘"></canvas>
+    </div>
+
+    <!-- 筛选 -->
+    <div class="filter-section">
+      <h2 class="section-title">💰 预算控制</h2>
+      <div class="budget-controls">
+        <label class="budget-option">
+          <input type="radio" name="budget" value="20" checked />
+          <span>20元</span>
+        </label>
+        <label class="budget-option">
+          <input type="radio" name="budget" value="50" />
+          <span>50元</span>
+        </label>
+        <label class="budget-option">
+          <input type="radio" name="budget" value="100" />
+          <span>100元</span>
+        </label>
+        <label class="budget-option">
+          <input type="radio" name="budget" value="999" />
+          <span>不限</span>
+        </label>
+      </div>
+
+      <h2 class="section-title">🌶️ 口味偏好</h2>
+      <div class="taste-controls">
+        <label class="taste-option">
+          <input type="checkbox" name="taste" value="清淡" />
+          <span>清淡</span>
+        </label>
+        <label class="taste-option">
+          <input type="checkbox" name="taste" value="中辣" />
+          <span>中辣</span>
+        </label>
+        <label class="taste-option">
+          <input type="checkbox" name="taste" value="重辣" />
+          <span>重辣</span>
+        </label>
+        <label class="taste-option">
+          <input type="checkbox" name="taste" value="素食" />
+          <span>素食</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- 推荐 + 最近选择 -->
+    <div class="recommend-section">
+      <h2 class="section-title">⭐ 今日推荐</h2>
+      <div id="todayRecommend" class="recommend-item">加载中...</div>
+
+      <h2 class="section-title">🧾 最近选择</h2>
+      <div id="recentChips" class="recent-chips"></div>
+    </div>
+
+    <!-- 自愿入口（保留） -->
+    <div class="menu-catalog-section">
+      <a id="catalogBtn" class="btn-catalog" href="#" rel="noopener noreferrer">
+        🎟️ 领取今日外卖券入口（自愿）
+      </a>
+    </div>
+  </div>
+
+  <!-- 结果弹窗 -->
+  <div id="resultModal" class="modal" aria-hidden="true">
+    <div class="modal-content" role="dialog" aria-modal="true">
+      <div class="modal-icon" id="modalIcon">🎉</div>
+      <h2 class="modal-title" id="modalTitle">恭喜你！</h2>
+      <p class="modal-text" id="modalText">今天吃火锅！</p>
+
+      <div class="modal-buttons">
+        <button id="modalActionBtn" class="btn-share" type="button">🎟️ 立即查看外卖优惠</button>
+        <button id="modalAgainBtn" class="btn-close" type="button">🔄 换一个结果</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 页脚（图二） -->
+  <footer class="footer">
+    <div class="footer-links">
+      <a href="#" id="privacyLink">隐私政策</a>
+      <span class="footer-split">|</span>
+      <a href="#" id="termsLink">使用条款</a>
+    </div>
+    <div class="footer-note">让选择变得有趣 🎉</div>
+  </footer>
+
+  <!-- 简单弹窗：隐私/条款/目录/统计 都复用这一套 -->
+  <div id="infoModal" class="modal" aria-hidden="true">
+    <div class="modal-content" role="dialog" aria-modal="true">
+      <h2 class="modal-title" id="infoTitle">信息</h2>
+      <p class="modal-text" id="infoText">内容</p>
+      <div class="modal-buttons">
+        <button id="infoOkBtn" class="btn-share" type="button">✅ 我知道了</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
