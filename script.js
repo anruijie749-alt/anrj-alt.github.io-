@@ -7,6 +7,16 @@ const CPS_LINKS = {
 };
 // ====================================================
 
+// ==================== 外卖平台直达配置（非联盟必填） ====================
+// 说明：这里是普通跳转，默认不给你带任何推广标记，不涉及年龄/联盟审核，
+// 只是帮你打开饿了么 / 美团官方页面，是否下单完全由用户自己决定。
+// 如你日后开通官方推广，可替换为你的合规推广链接。
+const PLATFORM_LINKS = {
+  eleme: 'https://h5.ele.me/',      // 饿了么H5首页（可按需修改）
+  meituan: 'https://i.waimai.meituan.com/' // 美团外卖H5首页（可按需修改）
+};
+// ====================================================
+
 // 转盘固定显示 12 扇形（你要的）
 const MAX_WHEEL_ITEMS = 12;
 
@@ -33,14 +43,14 @@ const menuItems = [
   { name: '麻辣烫', icon: '🌶️', price: 30, taste: ['中辣', '重辣'], vegetarian: false },
   { name: '沙拉', icon: '🥗', price: 35, taste: ['清淡'], vegetarian: true },
   { name: '炒饭', icon: '🍛', price: 20, taste: ['清淡', '中辣'], vegetarian: false },
-  { name: '水饺', icon: '🥟', price: 25, taste: ['清淡'], vegetarian: false },
+  { name: '水饺', icon: '🥟', price: 20, taste: ['清淡'], vegetarian: false },
   { name: '烧烤', icon: '🍢', price: 60, taste: ['中辣', '重辣'], vegetarian: false },
   { name: '寿司', icon: '🍣', price: 60, taste: ['清淡'], vegetarian: false },
   { name: '汉堡', icon: '🍔', price: 35, taste: ['清淡'], vegetarian: false },
   { name: '披萨', icon: '🍕', price: 50, taste: ['清淡'], vegetarian: false },
   { name: '炸鸡', icon: '🍗', price: 40, taste: ['清淡', '中辣'], vegetarian: false },
-  { name: '盖浇饭', icon: '🍱', price: 28, taste: ['清淡', '中辣'], vegetarian: false },
-  { name: '酸辣粉', icon: '🍲', price: 22, taste: ['中辣', '重辣'], vegetarian: false },
+  { name: '盖浇饭', icon: '🍱', price: 22, taste: ['清淡', '中辣'], vegetarian: false },
+  { name: '酸辣粉', icon: '🍲', price: 18, taste: ['中辣', '重辣'], vegetarian: false },
   { name: '粥', icon: '🥣', price: 15, taste: ['清淡'], vegetarian: true }
 ];
 
@@ -63,6 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
   updateTodayRecommend();
   updateRecentChips();
   initCatalogLink();
+  initPlatformButtons();
   initResultModal();
   initFooter();
 });
@@ -182,6 +193,33 @@ function initCatalogLink() {
     return;
   }
   bindSafeJump(catalogBtn, url);
+}
+
+function initPlatformButtons() {
+  const elemeBtn = document.getElementById('elemeBtn');
+  const meituanBtn = document.getElementById('meituanBtn');
+
+  const elemeUrl = (PLATFORM_LINKS.eleme || "").trim();
+  const meituanUrl = (PLATFORM_LINKS.meituan || "").trim();
+
+  if (elemeBtn) {
+    if (elemeUrl) {
+      bindSafeJump(elemeBtn, elemeUrl);
+    } else {
+      elemeBtn.classList.add('disabled');
+      elemeBtn.disabled = true;
+    }
+  }
+
+  if (meituanBtn) {
+    if (meituanUrl) {
+      bindSafeJump(meituanBtn, meituanUrl);
+    } else {
+      // 默认也允许作为普通直达使用，但不带任何“联盟”/“返利”字样
+      meituanBtn.classList.add('disabled');
+      meituanBtn.disabled = true;
+    }
+  }
 }
 
 function bindSafeJump(el, url) {
@@ -539,12 +577,14 @@ function openResultModal(item) {
 
   modal.classList.add('show');
   modal.setAttribute("aria-hidden", "false");
+  document.body.classList.add('modal-open');
 }
 
 function closeResultModal() {
   const modal = document.getElementById('resultModal');
   modal.classList.remove('show');
   modal.setAttribute("aria-hidden", "true");
+  document.body.classList.remove('modal-open');
 }
 
 // ----------------- 信息弹窗（隐私/条款/目录/统计共用） -----------------
@@ -559,10 +599,12 @@ function showInfo(title, text) {
 
   modal.classList.add('show');
   modal.setAttribute("aria-hidden", "false");
+  document.body.classList.add('modal-open');
 
   const close = () => {
     modal.classList.remove('show');
     modal.setAttribute("aria-hidden", "true");
+    document.body.classList.remove('modal-open');
   };
 
   ok.onclick = close;

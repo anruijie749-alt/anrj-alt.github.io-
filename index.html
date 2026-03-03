@@ -45,8 +45,8 @@
       <h2 class="section-title">💰 预算控制</h2>
       <div class="budget-controls">
         <label class="budget-option">
-          <input type="radio" name="budget" value="20" checked />
-          <span>20元</span>
+          <input type="radio" name="budget" value="30" checked />
+          <span>30元</span>
         </label>
         <label class="budget-option">
           <input type="radio" name="budget" value="50" />
@@ -54,7 +54,7 @@
         </label>
         <label class="budget-option">
           <input type="radio" name="budget" value="100" />
-          <span>100元</span>
+          <span>100元或请人吃😎</span>
         </label>
         <label class="budget-option">
           <input type="radio" name="budget" value="999" />
@@ -92,11 +92,26 @@
       <div id="recentChips" class="recent-chips"></div>
     </div>
 
-    <!-- 自愿入口（保留） -->
+    <!-- 自愿入口（保留） + 外卖平台直达按钮 -->
     <div class="menu-catalog-section">
       <a id="catalogBtn" class="btn-catalog" href="#" rel="noopener noreferrer">
         🎟️ 领取今日外卖券入口（自愿）
       </a>
+    </div>
+
+    <div class="platform-section">
+      <h2 class="section-title platform-title">🍱 外卖平台快捷入口（无强制、无默认推广）</h2>
+      <p class="platform-tip">
+        这里只是帮你快速打开平台App/H5，自行选择是否下单；如你以后开通官方推广，只需在配置里填入链接即可。
+      </p>
+      <div class="platform-buttons">
+        <button id="elemeBtn" class="btn-platform btn-eleme" type="button">
+          饿了么直达
+        </button>
+        <button id="meituanBtn" class="btn-platform btn-meituan" type="button">
+          美团外卖直达
+        </button>
+      </div>
     </div>
   </div>
 
