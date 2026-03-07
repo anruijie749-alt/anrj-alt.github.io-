@@ -2,8 +2,8 @@
 // 只需要改这里：把链接换成你的淘宝联盟/京东联盟链接（外卖券/红包入口）
 // 为空则自动隐藏入口，避免误触/违规风险
 const CPS_LINKS = {
-  prizeLink: 'https://m.tb.cn/h.7zBCqFm',
-  catalogLink: 'https://m.tb.cn/h.7zBCqFm'
+  prizeLink: 'https://s.click.taobao.com/pwygNAn',
+  catalogLink: 'https://s.click.taobao.com/JRThhKn'
 };
 // ====================================================
 
@@ -12,10 +12,31 @@ const CPS_LINKS = {
 // 只是帮你打开饿了么 / 美团官方页面，是否下单完全由用户自己决定。
 // 如你日后开通官方推广，可替换为你的合规推广链接。
 const PLATFORM_LINKS = {
-  eleme: 'https://h5.ele.me/',      // 饿了么H5首页（可按需修改）
+  eleme: 'https://s.click.taobao.com/JRThhKn',      // 饿了么H5首页（可按需修改）
   meituan: 'https://i.waimai.meituan.com/' // 美团外卖H5首页（可按需修改）
 };
 // ====================================================
+
+// ==================== IP定位（占位） ====================
+// 需求：尽量根据 IP 识别用户大致所在地，用于跳转到更匹配的“本地页/频道页”。
+// 你可以把 GEO_CONFIG.endpoint 换成你自己的接口：
+// - 你的后端：/api/geo/ip
+// - 第三方：返回 { country, province, city, district, adcode, lat, lng }
+// 注意：如果 endpoint 为空，本功能自动降级，不影响使用。
+const GEO_CONFIG = {
+  endpoint: "", // TODO: 填你的 IP 定位 API（留空=不请求）
+  timeoutMs: 1200,
+  cacheMs: 6 * 60 * 60 * 1000, // 6小时
+  storageKey: "geo_ip_cache_v1"
+};
+
+// 可选：按地区覆盖跳转（优先级最高）
+// key 可以是 adcode / 省 / 市（按你接口返回来定）
+const REGION_LINK_OVERRIDES = {
+  // 例子（占位）：
+  // "北京市": { meituan: "https://i.waimai.meituan.com/home?city=beijing", eleme: "https://h5.ele.me/msite/" }
+};
+// =======================================================
 
 // 转盘固定显示 12 扇形（你要的）
 const MAX_WHEEL_ITEMS = 12;
@@ -76,11 +97,14 @@ document.addEventListener('DOMContentLoaded', () => {
   initPlatformButtons();
   initResultModal();
   initFooter();
+  initGeoHintAndCache(); // 不阻塞交互，后台识别
 });
 
 function initParticleBackground() {
   const canvas = document.getElementById('particleCanvas');
   const ctx = canvas.getContext('2d');
+  const prefersReducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const isSmallScreen = Math.min(window.innerWidth, window.innerHeight) < 420;
 
   function resizeCanvas() {
     canvas.width = window.innerWidth;
@@ -137,13 +161,40 @@ function initParticleBackground() {
   }
 
   const particles = [];
-  for (let i = 0; i < 100; i++) particles.push(new Particle());
+  // 性能优化：移动端/小屏/减少动效场景降低粒子数量
+  const particleCount = prefersReducedMotion ? 0 : (isSmallScreen ? 45 : 90);
+  for (let i = 0; i < particleCount; i++) particles.push(new Particle());
+
+  if (particleCount === 0) {
+    // 用户系统设置“减少动效”：不绘制背景动画
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    return;
+  }
+
+  let rafId = 0;
+  let running = true;
 
   function animate() {
+    if (!running) return;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     for (const p of particles) { p.update(); p.draw(particles); }
-    requestAnimationFrame(animate);
+    rafId = requestAnimationFrame(animate);
   }
+
+  // 标签页不可见时暂停，避免后台耗电/卡顿
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+      running = false;
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = 0;
+      return;
+    }
+    if (!running) {
+      running = true;
+      animate();
+    }
+  });
+
   animate();
 }
 
@@ -192,7 +243,7 @@ function initCatalogLink() {
     catalogBtn.style.display = "none";
     return;
   }
-  bindSafeJump(catalogBtn, url);
+  bindSafeJump(catalogBtn, () => buildJumpUrl(url, { type: "coupon" }));
 }
 
 function initPlatformButtons() {
@@ -204,7 +255,7 @@ function initPlatformButtons() {
 
   if (elemeBtn) {
     if (elemeUrl) {
-      bindSafeJump(elemeBtn, elemeUrl);
+      bindSafeJump(elemeBtn, () => buildJumpUrl(elemeUrl, { platform: "eleme", type: "platform" }));
     } else {
       elemeBtn.classList.add('disabled');
       elemeBtn.disabled = true;
@@ -213,7 +264,7 @@ function initPlatformButtons() {
 
   if (meituanBtn) {
     if (meituanUrl) {
-      bindSafeJump(meituanBtn, meituanUrl);
+      bindSafeJump(meituanBtn, () => buildJumpUrl(meituanUrl, { platform: "meituan", type: "platform" }));
     } else {
       // 默认也允许作为普通直达使用，但不带任何“联盟”/“返利”字样
       meituanBtn.classList.add('disabled');
@@ -222,14 +273,18 @@ function initPlatformButtons() {
   }
 }
 
-function bindSafeJump(el, url) {
+function bindSafeJump(el, urlOrFactory) {
   if (!el) return;
-  el.setAttribute("href", url);
 
   el.addEventListener("pointerup", (ev) => {
     ev.preventDefault();
     if (jumpLock) return;
     jumpLock = true;
+
+    const url = (typeof urlOrFactory === "function")
+      ? urlOrFactory()
+      : urlOrFactory;
+    if (url) el.setAttribute("href", url);
 
     // 用 location 跳转更稳定（尤其微信内置）
     window.location.href = url;
@@ -554,7 +609,7 @@ function initResultModal() {
       return;
     }
     // 用 location 更稳（微信内置/浏览器拦截少）
-    window.location.href = url;
+    window.location.href = buildJumpUrl(url, { type: "coupon" });
   });
 
   // 弹窗按钮：换一个结果
@@ -654,4 +709,131 @@ function clearData() {
   drawWheel(lastCandidates);
 
   showInfo("✅ 已清除", "已清除最近选择与统计数据。");
+}
+
+// ----------------- IP定位（后台异步 + 缓存 + 占位API） -----------------
+function initGeoHintAndCache() {
+  const hint = document.getElementById("locationHint");
+  const prefersReducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  if (!hint) return;
+  hint.textContent = "📍 正在识别所在地区…（不影响使用）";
+
+  // 减少额外工作：如果用户系统设置“减少动效”，就不做地理请求
+  if (prefersReducedMotion) {
+    hint.textContent = "";
+    return;
+  }
+
+  // 异步执行，不阻塞首屏/转盘
+  setTimeout(async () => {
+    const geo = await getGeoByIpCached();
+    if (!geo) {
+      hint.textContent = "";
+      return;
+    }
+    const label = [geo.province, geo.city].filter(Boolean).join(" ");
+    hint.innerHTML = label ? `📍 已识别：<strong>${escapeHtml(label)}</strong>` : "";
+  }, 0);
+}
+
+function escapeHtml(str) {
+  return String(str)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function getGeoCacheSync() {
+  try {
+    const raw = localStorage.getItem(GEO_CONFIG.storageKey);
+    if (!raw) return null;
+    const cached = JSON.parse(raw);
+    if (!cached || !cached.ts || !cached.data) return null;
+    if ((Date.now() - cached.ts) >= GEO_CONFIG.cacheMs) return null;
+    return cached.data;
+  } catch (_) {
+    return null;
+  }
+}
+
+async function getGeoByIpCached() {
+  const cached = getGeoCacheSync();
+  if (cached) return cached;
+
+  const data = await fetchGeoByIp();
+  if (!data) return null;
+
+  try {
+    localStorage.setItem(GEO_CONFIG.storageKey, JSON.stringify({ ts: Date.now(), data }));
+  } catch (_) {}
+  return data;
+}
+
+async function fetchGeoByIp() {
+  const endpoint = (GEO_CONFIG.endpoint || "").trim();
+  if (!endpoint) return null; // 未配置则完全跳过
+
+  const controller = typeof AbortController !== "undefined" ? new AbortController() : null;
+  const t = setTimeout(() => controller?.abort(), GEO_CONFIG.timeoutMs);
+
+  try {
+    const res = await fetch(endpoint, {
+      method: "GET",
+      credentials: "omit",
+      cache: "no-store",
+      signal: controller?.signal
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+
+    // 允许多种字段名（尽量兼容）
+    const normalized = {
+      country: data.country || data.nation || "",
+      province: data.province || data.regionName || data.region || "",
+      city: data.city || "",
+      district: data.district || data.county || "",
+      adcode: data.adcode || data.code || "",
+      lat: data.lat || data.latitude || "",
+      lng: data.lng || data.lon || data.longitude || ""
+    };
+    return normalized;
+  } catch (_) {
+    return null;
+  } finally {
+    clearTimeout(t);
+  }
+}
+
+function buildJumpUrl(baseUrl, ctx = {}) {
+  const url = (baseUrl || "").trim();
+  if (!url) return url;
+
+  const geo = getGeoCacheSync();
+  if (!geo) return url;
+
+  // 1) 地区覆盖（你可在上方 REGION_LINK_OVERRIDES 配置）
+  const keys = [geo.adcode, geo.province, geo.city].filter(Boolean);
+  for (const k of keys) {
+    const override = REGION_LINK_OVERRIDES[k];
+    if (!override) continue;
+    if (ctx.platform && override[ctx.platform]) return override[ctx.platform];
+    if (!ctx.platform && override.default) return override.default;
+  }
+
+  // 2) 通用附参（占位）：把地区信息挂到 query 上，便于你后续在落地页/中转页解析
+  //   - 平台不一定会使用这些参数，但你如果用“中转页”就可以读到
+  try {
+    const u = new URL(url, window.location.href);
+    if (geo.province) u.searchParams.set("province", geo.province);
+    if (geo.city) u.searchParams.set("city", geo.city);
+    if (geo.adcode) u.searchParams.set("adcode", geo.adcode);
+    if (ctx.type) u.searchParams.set("src", ctx.type);
+    if (ctx.platform) u.searchParams.set("platform", ctx.platform);
+    return u.toString();
+  } catch (_) {
+    return url;
+  }
 }
