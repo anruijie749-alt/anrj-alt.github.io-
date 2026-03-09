@@ -332,9 +332,9 @@ body{
 .btn-eleme{
   background:linear-gradient(135deg,#00a0e9 0%,#30c5ff 100%);
 }
-.btn-meituan{
-  background:linear-gradient(135deg,#ffc300 0%,#ff9500 100%);
-  color:#442000;
+.btn-jingdong{
+  background:linear-gradient(135deg,#e1251b 0%,#ff5a50 100%);
+  color:#ffffff;
 }
 
 .modal{

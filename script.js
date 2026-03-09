@@ -13,7 +13,7 @@ const CPS_LINKS = {
 // 如你日后开通官方推广，可替换为你的合规推广链接。
 const PLATFORM_LINKS = {
   eleme: 'https://s.click.taobao.com/JRThhKn',      // 饿了么H5首页（可按需修改）
-  meituan: 'https://i.waimai.meituan.com/' // 美团外卖H5首页（可按需修改）
+  jingdong: 'https://daojia.jd.com/' // 京东秒送H5首页（可按需修改）
 };
 // ====================================================
 
@@ -86,6 +86,7 @@ let currentRotation = 0;
 let isSpinning = false;
 let lastCandidates = [];
 let jumpLock = false;
+let autoJumpTimer = null;
 
 document.addEventListener('DOMContentLoaded', () => {
   initParticleBackground();
@@ -248,10 +249,10 @@ function initCatalogLink() {
 
 function initPlatformButtons() {
   const elemeBtn = document.getElementById('elemeBtn');
-  const meituanBtn = document.getElementById('meituanBtn');
+  const jingdongBtn = document.getElementById('jingdongBtn');
 
   const elemeUrl = (PLATFORM_LINKS.eleme || "").trim();
-  const meituanUrl = (PLATFORM_LINKS.meituan || "").trim();
+  const jingdongUrl = (PLATFORM_LINKS.jingdong || "").trim();
 
   if (elemeBtn) {
     if (elemeUrl) {
@@ -262,13 +263,13 @@ function initPlatformButtons() {
     }
   }
 
-  if (meituanBtn) {
-    if (meituanUrl) {
-      bindSafeJump(meituanBtn, () => buildJumpUrl(meituanUrl, { platform: "meituan", type: "platform" }));
+  if (jingdongBtn) {
+    if (jingdongUrl) {
+      bindSafeJump(jingdongBtn, () => buildJumpUrl(jingdongUrl, { platform: "jingdong", type: "platform" }));
     } else {
       // 默认也允许作为普通直达使用，但不带任何“联盟”/“返利”字样
-      meituanBtn.classList.add('disabled');
-      meituanBtn.disabled = true;
+      jingdongBtn.classList.add('disabled');
+      jingdongBtn.disabled = true;
     }
   }
 }
@@ -472,7 +473,8 @@ function setSpinningUI(spinning) {
 
 // 固定 12 扇形：从候选里抽 12 个展示与旋转
 function getCandidatesForWheel() {
-  const budget = parseInt(document.querySelector('input[name="budget"]:checked')?.value || "50", 10);
+  const budgetInput = document.querySelector('input[name="budget"]:checked');
+  const budget = parseInt(budgetInput ? budgetInput.value : "50", 10);
   const selectedTastes = Array.from(document.querySelectorAll('input[name="taste"]:checked')).map(cb => cb.value);
 
   const recentNames = history.slice(-3).map(h => h.name);
@@ -624,6 +626,7 @@ function openResultModal(item) {
   const modal = document.getElementById('resultModal');
   const modalText = document.getElementById('modalText');
   const modalIcon = document.getElementById('modalIcon');
+  const actionBtn = document.getElementById('modalActionBtn');
 
   const desc = item.desc ? `\n${item.desc}` : '';
   modalText.textContent =
@@ -633,9 +636,33 @@ function openResultModal(item) {
   modal.classList.add('show');
   modal.setAttribute("aria-hidden", "false");
   document.body.classList.add('modal-open');
+
+  // Auto redirect logic
+  const url = (CPS_LINKS.prizeLink || "").trim();
+  if (url && actionBtn) {
+    let countdown = 3;
+    actionBtn.textContent = `🎟️ 立即查看外卖优惠 (${countdown}s后自动跳转)`;
+    
+    if (autoJumpTimer) clearInterval(autoJumpTimer);
+    autoJumpTimer = setInterval(() => {
+      countdown--;
+      if (countdown > 0) {
+        actionBtn.textContent = `🎟️ 立即查看外卖优惠 (${countdown}s后自动跳转)`;
+      } else {
+        clearInterval(autoJumpTimer);
+        window.location.href = buildJumpUrl(url, { type: "coupon" });
+      }
+    }, 1000);
+  } else if (actionBtn) {
+    actionBtn.textContent = "🎟️ 立即查看外卖优惠";
+  }
 }
 
 function closeResultModal() {
+  if (autoJumpTimer) clearInterval(autoJumpTimer);
+  const actionBtn = document.getElementById('modalActionBtn');
+  if (actionBtn) actionBtn.textContent = "🎟️ 立即查看外卖优惠";
+
   const modal = document.getElementById('resultModal');
   modal.classList.remove('show');
   modal.setAttribute("aria-hidden", "true");
@@ -685,7 +712,7 @@ function showStats() {
 
   const lines = entries.map(([name, count], idx) => {
     const item = menuItems.find(x => x.name === name);
-    const icon = item?.icon || "🍽️";
+    const icon = (item && item.icon) ? item.icon : "🍽️";
     return `${idx + 1}. ${icon} ${name}：${count}次`;
   }).join('\n');
 
@@ -739,11 +766,11 @@ function initGeoHintAndCache() {
 
 function escapeHtml(str) {
   return String(str)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 }
 
 function getGeoCacheSync() {
@@ -777,14 +804,14 @@ async function fetchGeoByIp() {
   if (!endpoint) return null; // 未配置则完全跳过
 
   const controller = typeof AbortController !== "undefined" ? new AbortController() : null;
-  const t = setTimeout(() => controller?.abort(), GEO_CONFIG.timeoutMs);
+  const t = setTimeout(() => { if (controller) controller.abort() }, GEO_CONFIG.timeoutMs);
 
   try {
     const res = await fetch(endpoint, {
       method: "GET",
       credentials: "omit",
       cache: "no-store",
-      signal: controller?.signal
+      signal: controller ? controller.signal : undefined
     });
     if (!res.ok) return null;
     const data = await res.json();
