@@ -2,8 +2,8 @@
 // 只需要改这里：把链接换成你的淘宝联盟/京东联盟链接（外卖券/红包入口）
 // 为空则自动隐藏入口，避免误触/违规风险
 const CPS_LINKS = {
-  prizeLink: 'https://s.click.taobao.com/pwygNAn',
-  catalogLink: 'https://s.click.taobao.com/JRThhKn'
+  prizeLink: 'https://s.click.taobao.com/Kxgg16n',
+  catalogLink: ' CZ009 lYlQUvr1rbD￥ https://m.tb.cn/h.iWrNQeO'
 };
 // ====================================================
 
@@ -12,8 +12,8 @@ const CPS_LINKS = {
 // 只是帮你打开饿了么 / 美团官方页面，是否下单完全由用户自己决定。
 // 如你日后开通官方推广，可替换为你的合规推广链接。
 const PLATFORM_LINKS = {
-  eleme: 'https://s.click.taobao.com/JRThhKn',      // 饿了么H5首页（可按需修改）
-  jingdong: 'https://daojia.jd.com/' // 京东秒送H5首页（可按需修改）
+  eleme: 'https://s.click.taobao.com/sRjhz5n',      // 饿了么H5首页（可按需修改）
+  jingdong: 'https://u.jd.com/NGYJ9U4' // 京东秒送H5首页（可按需修改）
 };
 // ====================================================
 
