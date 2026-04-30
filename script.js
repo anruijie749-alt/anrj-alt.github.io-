@@ -2,8 +2,8 @@
 // 只需要改这里：把链接换成你的淘宝联盟/京东联盟链接（外卖券/红包入口）
 // 为空则自动隐藏入口，避免误触/违规风险
 const CPS_LINKS = {
-  prizeLink: 'https://s.click.taobao.com/Kxgg16n',
-  catalogLink: ' CZ009 lYlQUvr1rbD￥ https://m.tb.cn/h.iWrNQeO'
+  prizeLink: '28 HU7405  666:/₴sbhiUwwPygz£三闪购大额满减红包',
+  catalogLink: '47 HU7405  666:/✔sc2cUwwlG0P四闪购大额满减红包'
 };
 // ====================================================
 
@@ -12,8 +12,8 @@ const CPS_LINKS = {
 // 只是帮你打开饿了么 / 美团官方页面，是否下单完全由用户自己决定。
 // 如你日后开通官方推广，可替换为你的合规推广链接。
 const PLATFORM_LINKS = {
-  eleme: 'https://s.click.taobao.com/sRjhz5n',      // 饿了么H5首页（可按需修改）
-  jingdong: 'https://u.jd.com/NGYJ9U4' // 京东秒送H5首页（可按需修改）
+  eleme: '17 HU7405  666:/TGQbUwwjDb5✔四最高抢66元大红包',      // 饿了么H5首页（可按需修改）
+  jingdong: 'https://u.jd.com/NOZfbpn' // 京东秒送H5首页（可按需修改）
 };
 // ====================================================
 
@@ -24,7 +24,7 @@ const PLATFORM_LINKS = {
 // - 第三方：返回 { country, province, city, district, adcode, lat, lng }
 // 注意：如果 endpoint 为空，本功能自动降级，不影响使用。
 const GEO_CONFIG = {
-  endpoint: "", // TODO: 填你的 IP 定位 API（留空=不请求）
+  endpoint: "https://ipapi.co/json/",// TODO: 填你的 IP 定位 API（留空=不请求）
   timeoutMs: 1200,
   cacheMs: 6 * 60 * 60 * 1000, // 6小时
   storageKey: "geo_ip_cache_v1"
@@ -639,23 +639,15 @@ function openResultModal(item) {
 
   // Auto redirect logic
   const url = (CPS_LINKS.prizeLink || "").trim();
-  if (url && actionBtn) {
-    let countdown = 3;
-    actionBtn.textContent = `🎟️ 立即查看外卖优惠 (${countdown}s后自动跳转)`;
-    
-    if (autoJumpTimer) clearInterval(autoJumpTimer);
-    autoJumpTimer = setInterval(() => {
-      countdown--;
-      if (countdown > 0) {
-        actionBtn.textContent = `🎟️ 立即查看外卖优惠 (${countdown}s后自动跳转)`;
-      } else {
-        clearInterval(autoJumpTimer);
-        window.location.href = buildJumpUrl(url, { type: "coupon" });
-      }
-    }, 1000);
-  } else if (actionBtn) {
-    actionBtn.textContent = "🎟️ 立即查看外卖优惠";
-  }
+if (url && actionBtn) {
+  actionBtn.textContent = "🎟️ 立即查看外卖优惠";
+  actionBtn.onclick = () => {
+    window.open(buildJumpUrl(url, { type: "coupon" }), "_blank");
+  };
+} else if (actionBtn) {
+  actionBtn.textContent = "🎟️ 立即查看外卖优惠";
+  actionBtn.disabled = true;
+}
 }
 
 function closeResultModal() {
