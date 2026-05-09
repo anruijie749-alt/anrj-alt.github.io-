@@ -3,20 +3,26 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="description" content="随机午餐大转盘，一键决定今天吃什么！可自愿领取外卖优惠入口。" />
+  <meta name="description" content="今天吃什么总纠结？使用随机午餐转盘快速决定午餐选择，支持预算筛选、口味偏好、最近记录，让选择更轻松。" />
   <meta name="keywords" content="午餐,转盘,随机,美食,外卖优惠" />
-  <title>🍜今天吃什么？随机午餐转盘 + 外卖红包领取</title>
+  <title>🍜今天吃什么？随机午餐转盘｜午餐选择工具</title>
   <!-- 改成 ✅ 直接用表情，不需要文件 -->
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍜</text></svg>" />
-  <!-- SEO基础 -->
+ <!-- 出海英文SEO补充 -->
+<meta name="keywords" content="lunch picker, what to eat today, random food wheel, lunch roulette, food delivery" />
+<meta property="og:image" content="https://lunch.anrjai.com/og-cover.png" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Lunch Roulette - Random Food Picker" />
+<meta name="twitter:description" content="Can't decide what to eat? Spin the wheel and let fate choose your lunch!" />
+<!-- SEO基础 -->
 <meta name="robots" content="index, follow" />
-<link rel="canonical" href="https://anrjai.com/" />
+<link rel="canonical" href="https://lunch.anrjai.com/" />
 
 <!-- 社交分享OG标签 -->
 <meta property="og:title" content="今天吃什么？外卖红包转盘" />
-<meta property="og:description" content="随机午餐大转盘，一键决定今天吃什么，顺手领外卖红包省钱！" />
+<meta property="og:description" content="随机午餐大转盘，一键决定今天吃什么，外卖优惠信息（自愿）！" />
 <meta property="og:type" content="website" />
-<meta property="og:url" content="https://anrjai.com/" />
+<meta property="og:url" content="https://lunch.anrjai.com/" />
 <meta property="og:locale" content="zh_CN" />
 
 <!-- 结构化数据 -->
@@ -26,7 +32,7 @@
   "@type": "WebApplication",
   "name": "今天吃什么 - 外卖红包转盘",
   "description": "随机午餐转盘工具，帮你决定今天吃什么，同时领取外卖优惠红包",
-  "url": "https://anrjai.com/",
+  "url": "https://lunch.anrjai.com/",
   "applicationCategory": "LifestyleApplication",
   "inLanguage": "zh-CN"
 }
@@ -38,7 +44,7 @@
   <canvas id="particleCanvas"></canvas>
 
   <div class="container">
-    <h1 class="title">🍽️ 今天吃什么？</h1>
+    <h1 class="title">🍽️ 今天吃什么？随机午餐转盘</h1>
     <p class="subtitle">
       每天中午纠结吃什么？点一下直接给答案（可选：结果页提供外卖优惠入口，自愿领取）。
     </p>
@@ -49,7 +55,7 @@
     <!-- 主按钮区 -->
     <div class="button-area">
       <div class="today-tip">
-        🔥 今日外卖红包已更新，先领红包再下单更省钱
+        🔥 查看今日优惠信息，先领红包再下单更省钱
         </div> 
       <button id="spinBtn" class="btn-primary" type="button">🎲 随机外卖盲盒</button>
       <button id="againBtn" class="btn-secondary" type="button" disabled>🔄 换一个结果</button>
@@ -126,7 +132,7 @@
     <!-- 自愿入口（保留） + 外卖平台直达按钮 -->
     <div class="menu-catalog-section">
       <a id="catalogBtn" class="btn-catalog" href="#" rel="noopener noreferrer">
-        🎟️ 领取今日外卖券入口（自愿）
+        🎟️ 查看平台活动入口（自愿）
       </a>
     </div>
 
@@ -154,13 +160,20 @@
       <p class="modal-text" id="modalText">今天吃火锅！</p>
 
       <div class="modal-buttons">
-        <button id="modalActionBtn" class="btn-share" type="button">🎟️ 立即查看外卖优惠</button>
+        <button id="modalActionBtn" class="btn-share" type="button">🎟️ 跳转平台查看优惠</button>
         <button id="modalAgainBtn" class="btn-close" type="button">🔄 换一个结果</button>
       </div>
     </div>
   </div>
 
   <!-- 页脚（图二） -->
+  <section class="seo-text">
+    <h2>午餐选择困难怎么办？</h2>
+    <p>
+    本工具通过随机午餐转盘帮助你快速决定今天吃什么，
+    支持预算筛选、口味偏好设置，适合上班族、学生党和日常外卖选择。
+    </p>
+    </section>
   <footer class="footer">
     <div class="footer-links">
       <a href="#" id="privacyLink">隐私政策</a>
