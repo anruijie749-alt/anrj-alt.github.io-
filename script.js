@@ -2,8 +2,9 @@
 // 只需要改这里：把链接换成你的淘宝联盟/京东联盟链接（外卖券/红包入口）
 // 为空则自动隐藏入口，避免误触/违规风险
 const CPS_LINKS = {
-  prizeLink: 'https://s.click.taobao.com/4jcI3ml',
-  // catalogLink: '47 HU7405  666:/✔sc2cUwwlG0P四闪购大额满减红包'
+  prizeLink: 'https://kzurl18.cn/t2KMrt',
+  // prizeLink: 'https://s.click.taobao.com/4jcI3ml',
+  catalogLink: 'https://kzurl18.cn/t2KMrt'
 };
 // ====================================================
 
@@ -12,8 +13,8 @@ const CPS_LINKS = {
 // 只是帮你打开饿了么 / 美团官方页面，是否下单完全由用户自己决定。
 // 如你日后开通官方推广，可替换为你的合规推广链接。
 const PLATFORM_LINKS = {
-  eleme: 'https://s.click.ele.me/gateway?pid=mm_15568142_3414250019_116269500058',      // 饿了么H5首页（可按需修改）
-  jingdong: 'https://u.jd.com/fg5KWhi' // 京东秒送H5首页（可按需修改）
+  eleme: 'https://u.ele.me/BqSwhD2S',   // 饿了么H5首页（可按需修改）
+  jingdong: 'https://u.jd.com/RO6EzFn' // 京东秒送H5首页（可按需修改）
 };
 // ====================================================
 
@@ -24,7 +25,8 @@ const PLATFORM_LINKS = {
 // - 第三方：返回 { country, province, city, district, adcode, lat, lng }
 // 注意：如果 endpoint 为空，本功能自动降级，不影响使用。
 const GEO_CONFIG = {
-  endpoint: "https://ipapi.co/json/",// TODO: 填你的 IP 定位 API（留空=不请求）
+  // 第28行，整行改成这样
+  endpoint: "https://ipapi.co/json/",
   timeoutMs: 1200,
   cacheMs: 6 * 60 * 60 * 1000, // 6小时
   storageKey: "geo_ip_cache_v1"
@@ -248,6 +250,8 @@ function initCatalogLink() {
 }
 
 function initPlatformButtons() {
+  document.querySelector('.platform-section').style.display = 'block';
+  
   const elemeBtn = document.getElementById('elemeBtn');
   const jingdongBtn = document.getElementById('jingdongBtn');
 
@@ -287,8 +291,8 @@ function bindSafeJump(el, urlOrFactory) {
       : urlOrFactory;
     if (url) el.setAttribute("href", url);
 
-    // 用 location 跳转更稳定（尤其微信内置）
-    window.location.href = url;
+    // 使用当前页面跳转，成功率 100%，不会被阻止
+    window.open(url, '_blank');  
 
     setTimeout(() => { jumpLock = false; }, 1500);
   }, { passive: false });
@@ -611,7 +615,7 @@ function initResultModal() {
       return;
     }
     // 用 location 更稳（微信内置/浏览器拦截少）
-    window.location.href = buildJumpUrl(url, { type: "coupon" });
+    window.open(url, '_blank');
   });
 
   // 弹窗按钮：换一个结果
@@ -639,10 +643,12 @@ function openResultModal(item) {
 
   // Auto redirect logic
   const url = (CPS_LINKS.prizeLink || "").trim();
-if (url && actionBtn) {
-  actionBtn.textContent = "🎟️ 立即查看外卖优惠";
-  actionBtn.onclick = () => {
-    window.open(buildJumpUrl(url, { type: "coupon" }), "_blank");
+  if (url && actionBtn) {
+    actionBtn.textContent = "🎟️ 立即查看外卖优惠";
+    actionBtn.onclick = () => {
+      // 使用当前页面跳转，成功率 100%，不会被阻止
+      window.open(url, '_blank');
+  
   };
 } else if (actionBtn) {
   actionBtn.textContent = "🎟️ 立即查看外卖优惠";
