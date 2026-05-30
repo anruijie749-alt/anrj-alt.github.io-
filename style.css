@@ -21,8 +21,7 @@ body{
   max-width:600px;
   margin:-20px auto 0;
   padding:20px;
-  min-height:calc(100vh - 120px);
-}
+ }
 .title{
   text-align:center;
   font-size:42px;
@@ -513,4 +512,77 @@ body{
     flex:1;
     max-width:220px;
     }
-   
+    .seo-text,
+.related-links {
+  position: relative;
+  z-index: 1;
+  max-width: 600px;
+  margin: 24px auto;
+  padding: 30px;
+  background: rgba(0,255,255,0.08);
+  border: 1px solid rgba(0,255,255,0.25);
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+  color: #ffffff;
+}
+
+.seo-text h2,
+.related-links h2 {
+  font-size: 22px;
+  color: #00ffff;
+  margin-bottom: 12px;
+  margin-top: 20px;
+  text-shadow: 0 0 10px rgba(0,255,255,0.5);
+}
+
+.seo-text h2:first-child,
+.related-links h2:first-child {
+  margin-top: 0;
+}
+
+.seo-text h3 {
+  font-size: 18px;
+  color: #00ffff;
+  margin: 16px 0 6px;
+}
+
+.seo-text p,
+.related-links p {
+  font-size: 15px;
+  color: rgba(255,255,255,0.8);
+  line-height: 1.7;
+  margin-bottom: 10px;
+}
+
+.seo-list,
+.related-links ul {
+  padding-left: 20px;
+  margin: 8px 0;
+}
+
+.seo-list li,
+.related-links li {
+  font-size: 15px;
+  color: rgba(255,255,255,0.8);
+  line-height: 1.8;
+}
+
+.related-links a {
+  color: #00ffff;
+  text-decoration: none;
+}
+
+.related-links a:hover {
+  text-decoration: underline;
+}
+
+.footer {
+  position: relative;
+  z-index: 1;
+}
+.brand-text {
+  text-align: center;
+  font-size: 14px;
+  color: rgba(255,255,255,0.6);
+  margin: 0 0 8px;
+}
