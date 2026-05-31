@@ -758,7 +758,7 @@ function initGeoHintAndCache() {
       return;
     }
     const label = [geo.province, geo.city].filter(Boolean).join(" ");
-    hint.innerHTML = label ? `📍 已识别：<strong>${escapeHtml(label)}</strong>` : "";
+    hint.textContent = `📍 已识别您的位置，为您推荐本地餐饮`;
   }, 0);
 }
 
