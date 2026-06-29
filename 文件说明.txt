@@ -1,0 +1,44 @@
+office.html：办公室 / 上班族
+
+midnight.html：夜宵 / 深夜
+
+student.html：学生
+
+hotpot.html：火锅
+
+index.html：首页 / 主页
+
+takeout.html：外卖
+
+food-wheel.html：美食转盘 / 幸运大转盘
+
+couple.html：情侣 / 双人
+
+dinner.html：晚餐 / 正餐
+
+what-to-eat.html：吃什么 / 今天吃什么
+
+decision.html：做决定 / 帮我选
+
+diet.html：减脂餐 / 饮食计划
+
+breakfast.html：早餐
+
+terms.html：服务条款 / 用户协议
+
+privacy.html：隐私政策
+
+系统与配置文件
+sitemap.xml：网站地图（用于搜索引擎优化）
+
+robots.txt：爬虫协议文件
+
+og-cover.png：社交媒体分享封面图 (Open Graph Cover)
+
+google63b775cbd01e4605.html：谷歌网站所有权验证文件
+
+script.js：JavaScript 脚本源代码文件（负责网页动态功能）
+
+style.css：CSS 样式表源代码文件（负责网页外观排版）
+
+root.txt：根目录说明/验证文本
