@@ -586,3 +586,24 @@ body{
   color: rgba(255,255,255,0.6);
   margin: 0 0 8px;
 }
+.seo-text,
+.related-links {
+  position: relative;
+  z-index: 1;
+  max-width: 600px;
+  margin: 24px auto;
+  padding: 30px;
+  background: rgba(0,255,255,0.08);
+  border: 1px solid rgba(0,255,255,0.25);
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+  color: #ffffff;
+}
+.seo-text h2,
+.related-links h2 {
+  font-size: 22px;
+  color: #00ffff;
+  margin-bottom: 12px;
+  margin-top: 20px;
+  text-shadow: 0 0 10px rgba(0,255,255,0.5);
+}
