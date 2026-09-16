@@ -5,15 +5,18 @@
 // 你的淘宝PID（仅核对用，真正用的是下方 taobao 字段里转链后的 s.click.taobao.com 链接）：
 // mm_15568142_3414250019_116269500058  （媒体：今天吃什么外卖大转盘）
 const UNION_LINKS = {
-  taobao:   'https://uland.taobao.com/coupon/edetail?pid=mm_15568142_3414250019_116269500058',  // 用你的淘宝PID(mm_15568142_3414250019_116269500058/媒体:今天吃什么外卖大转盘)拼的推广位落地页直链，带佣金追踪
-  jingdong: 'https://u.jd.com/RO6EzFn',  // ⚠️待确认：你之前代码里的京东短码，若是你推广位的即可赚佣金，不是请换成你的京东PID链接
-  eleme:    'https://u.ele.me/BqSwhD2S'  // ⚠️待确认：你之前代码里的饿了么短码，若是你推广位的即可赚佣金，不是请换成你的饿了么PID链接
+  // ⚠️ 以下三个必须填【你自己联盟后台生成的推广链接】才能赚佣金。
+  // 目前留空 = 不跳任何来路不明的链接（避免佣金外流给他人）。
+  // 拿到后填进来即可，会自动生效。
+  taobao:   '',
+  jingdong: '',
+  eleme:    ''
 };
-// 兜底：UNION_LINKS 某平台留空时，用这里的普通平台首页（不带佣金，纯跳转官网）。
-// 同样只填你确认的官方/自己的链接，不要填来路不明的短码。
+// 兜底：UNION_LINKS 留空时，用这里的【官方平台入口】(不带佣金、纯跳转官网，保证不报错)。
 const PLATFORM_LINKS = {
-  eleme: '',
-  jingdong: ''
+  eleme:    'https://www.ele.me/',
+  jingdong: 'https://www.jd.com/',
+  taobao:   'https://www.taobao.com/'
 };
 // ====================================================
 
@@ -673,8 +676,14 @@ function setupUnionChooser() {
 
 // 取第一个可用的联盟链接（淘宝优先）
 function getFirstUnionUrl() {
+  // 优先用你自己的联盟链接（有佣金）
   for (const k of ['taobao', 'jingdong', 'eleme']) {
     const url = (UNION_LINKS[k] || '').trim();
+    if (url) return url;
+  }
+  // 兜底：联盟链接未配置时，跳官方平台入口（不带佣金，但保证能打开、不报错）
+  for (const k of ['eleme', 'jingdong', 'taobao']) {
+    const url = (PLATFORM_LINKS[k] || '').trim();
     if (url) return url;
   }
   return '';
