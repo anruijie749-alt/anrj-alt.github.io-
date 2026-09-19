@@ -5,14 +5,17 @@
 // 你的淘宝PID（仅核对用，真正用的是下方 taobao 字段里转链后的 s.click.taobao.com 链接）：
 // mm_15568142_3414250019_116269500058  （媒体：今天吃什么外卖大转盘）
 const UNION_LINKS = {
-  // ⚠️ 以下三个必须填【你自己联盟后台生成的推广链接】才能赚佣金。
-  // 目前留空 = 不跳任何来路不明的链接（避免佣金外流给他人）。
-  // 拿到后填进来即可，会自动生效。
-  taobao:   '',
-  jingdong: '',
-  // 饿了么外卖红包（用户 2026-09-19 从淘宝闪购 e起赚 点淘宝推广生成）。
-  // 属 h5 唤端链接：手机上点会唤起 App 领红包；电脑上无效，页面会同时展示二维码供手机扫。
-  eleme:    'https://m.duanqu.com/?_ariver_appid=8251537&page=plugin-private%3A%2F%2F2021003183669766%2Fpages%2Fwh-coupon-guide%2Findex%3Fscene%3D572edc88a64f4fb79863637debb34934'
+  // 说明（2026-09-19 更新）：
+  // 【淘宝闪购 / 饿了么】用户从「淘宝闪购 e起赚」点「淘宝推广」生成的推广链接。
+  //   饿了么已并入淘宝闪购（阿里系），两者共用同一条推广链接，佣金记在用户账号下。
+  //   链接类型为 h5 唤端链接：手机上点会唤起淘宝/支付宝里的小程序领红包；
+  //   电脑上无法唤起，页面会同时展示二维码，可用手机支付宝扫。
+  taobao:   'https://m.duanqu.com/?_ariver_appid=8251537&page=plugin-private%3A%2F%2F2021003183669766%2Fpages%2Fwh-coupon-guide%2Findex%3Fscene%3D572edc88a64f4fb79863637debb34934',
+  // 饿了么：与 taobao 为同一条淘宝闪购推广链接（同一平台、同一佣金账号）。
+  eleme:    'https://m.duanqu.com/?_ariver_appid=8251537&page=plugin-private%3A%2F%2F2021003183669766%2Fpages%2Fwh-coupon-guide%2Findex%3Fscene%3D572edc88a64f4fb79863637debb34934',
+  // 京东：京东属独立体系，需另行在京东联盟（union.jd.com）生成自己的推广链接后填入。
+  // 留空 = 不跳任何来路不明链接，避免佣金外流给他人；此时该入口走官方兜底（不带佣金）。
+  jingdong: ''
 };
 // 兜底：UNION_LINKS 留空时，用这里的【官方平台入口】(不带佣金、纯跳转官网，保证不报错)。
 const PLATFORM_LINKS = {
