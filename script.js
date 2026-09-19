@@ -10,7 +10,9 @@ const UNION_LINKS = {
   // 拿到后填进来即可，会自动生效。
   taobao:   '',
   jingdong: '',
-  eleme:    ''
+  // 饿了么外卖红包（用户 2026-09-19 从淘宝闪购 e起赚 点淘宝推广生成）。
+  // 属 h5 唤端链接：手机上点会唤起 App 领红包；电脑上无效，页面会同时展示二维码供手机扫。
+  eleme:    'https://m.duanqu.com/?_ariver_appid=8251537&page=plugin-private%3A%2F%2F2021003183669766%2Fpages%2Fwh-coupon-guide%2Findex%3Fscene%3D572edc88a64f4fb79863637debb34934'
 };
 // 兜底：UNION_LINKS 留空时，用这里的【官方平台入口】(不带佣金、纯跳转官网，保证不报错)。
 const PLATFORM_LINKS = {
@@ -617,7 +619,14 @@ function initResultModal() {
       showInfo("提示", "佣金入口尚未配置，请在 lunch/script.js 的 UNION_LINKS 填入你的联盟PID链接。");
       return;
     }
-    window.open(firstUrl, '_blank', 'noopener');
+    // 始终展示二维码：电脑上的访客用手机扫码即可领取（h5 唤端链接在电脑上无效）
+    const qrBlock = document.getElementById('qrBlock');
+    if (qrBlock) qrBlock.style.display = 'block';
+    // 手机上直接打开（唤起 App）；电脑上不打开，避免跳到"请下载App"的空页面
+    const isMobile = /Android|iPhone|iPad|iPod|Mobile|HarmonyOS/i.test(navigator.userAgent);
+    if (isMobile) {
+      window.open(firstUrl, '_blank', 'noopener');
+    }
   });
 
   // 弹窗按钮：换一个结果
