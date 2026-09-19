@@ -621,7 +621,20 @@ function initResultModal() {
     }
     // 始终展示二维码：电脑上的访客用手机扫码即可领取（h5 唤端链接在电脑上无效）
     const qrBlock = document.getElementById('qrBlock');
-    if (qrBlock) qrBlock.style.display = 'block';
+    if (qrBlock) {
+      qrBlock.style.display = 'block';
+      // 弹窗内容较长时，自动滚动到二维码位置，避免访客不知道要往下滚
+      setTimeout(() => {
+        const mc = document.querySelector('#resultModal .modal-content');
+        if (mc && mc.scrollHeight > mc.clientHeight) {
+          mc.scrollTo({ top: mc.scrollHeight, behavior: 'smooth' });
+        } else if (qrBlock.scrollIntoView) {
+          qrBlock.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+      }, 120);
+      // 按钮文字同步提示，让访客知道往下看
+      actionBtn.textContent = '👇 请扫下方二维码领取';
+    }
     // 手机上直接打开（唤起 App）；电脑上不打开，避免跳到"请下载App"的空页面
     const isMobile = /Android|iPhone|iPad|iPod|Mobile|HarmonyOS/i.test(navigator.userAgent);
     if (isMobile) {
