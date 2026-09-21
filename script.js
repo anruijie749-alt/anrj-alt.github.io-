@@ -33,7 +33,8 @@ const PLATFORM_LINKS = {
 // 注意：如果 endpoint 为空，本功能自动降级，不影响使用。
 const GEO_CONFIG = {
   // 第28行，整行改成这样
-  endpoint: "https://ipapi.co/json/",
+  // 2026-09-21：本站面向全国（将来面向海外华人），不做地区识别，故留空禁用（自动降级，不请求第三方接口）
+  endpoint: "",
   timeoutMs: 1200,
   cacheMs: 6 * 60 * 60 * 1000, // 6小时
   storageKey: "geo_ip_cache_v1"
@@ -800,7 +801,8 @@ function initGeoHintAndCache() {
   const prefersReducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   if (!hint) return;
-  hint.textContent = "📍 正在识别所在地区…（不影响使用）";
+  // 本站不做地区识别，不显示任何定位提示
+  hint.textContent = "";
 
   // 减少额外工作：如果用户系统设置“减少动效”，就不做地理请求
   if (prefersReducedMotion) {
@@ -816,7 +818,7 @@ function initGeoHintAndCache() {
       return;
     }
     const label = [geo.province, geo.city].filter(Boolean).join(" ");
-    hint.textContent = `📍 已识别您的位置，为您推荐本地餐饮`;
+    hint.textContent = "";
   }, 0);
 }
 
