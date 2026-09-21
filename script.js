@@ -1,23 +1,23 @@
-// ==================== 联盟CPS佣金入口配置 ====================
-// 【重要】下面必须填你自己在联盟后台生成的【带PID的推广链接】，才能赚佣金。
+// ==================== 外卖红包入口配置 ====================
+// 【重要】下面填平台后台生成的【带标识的推广链接】，这样入口才可使用。
 // 目前暂留空：未配置真实PID链接前，对应平台按钮自动隐藏，绝不跳转任何无关/他人链接。
 // 等你把三个真实链接发给我，我填进去即可上线。
 // 你的淘宝PID（仅核对用，真正用的是下方 taobao 字段里转链后的 s.click.taobao.com 链接）：
 // mm_15568142_3414250019_116269500058  （媒体：今天吃什么外卖大转盘）
 const UNION_LINKS = {
   // 说明（2026-09-19 更新）：
-  // 【淘宝闪购 / 饿了么】用户从「淘宝闪购 e起赚」点「淘宝推广」生成的推广链接。
-  //   饿了么已并入淘宝闪购（阿里系），两者共用同一条推广链接，佣金记在用户账号下。
+  // 【淘宝闪购 / 饿了么】用户从「淘宝闪购 e起」点「淘宝推广」生成的推广链接。
+  //   饿了么已并入淘宝闪购（阿里系），两者共用同一条链接。
   //   链接类型为 h5 唤端链接：手机上点会唤起淘宝/支付宝里的小程序领红包；
   //   电脑上无法唤起，页面会同时展示二维码，可用手机支付宝扫。
   taobao:   'https://m.duanqu.com/?_ariver_appid=8251537&page=plugin-private%3A%2F%2F2021003183669766%2Fpages%2Fwh-coupon-guide%2Findex%3Fscene%3D572edc88a64f4fb79863637debb34934',
-  // 饿了么：与 taobao 为同一条淘宝闪购推广链接（同一平台、同一佣金账号）。
+  // 饿了么：与 taobao 为同一条淘宝闪购链接（同一平台）。
   eleme:    'https://m.duanqu.com/?_ariver_appid=8251537&page=plugin-private%3A%2F%2F2021003183669766%2Fpages%2Fwh-coupon-guide%2Findex%3Fscene%3D572edc88a64f4fb79863637debb34934',
-  // 京东：京东属独立体系，需另行在京东联盟（union.jd.com）生成自己的推广链接后填入。
-  // 留空 = 不跳任何来路不明链接，避免佣金外流给他人；此时该入口走官方兜底（不带佣金）。
+  // 京东：京东属独立体系，需另行在京东平台（union.jd.com）生成自己的推广链接后填入。
+  // 留空 = 不跳任何来路不明链接；此时该入口走官方兜底（纯跳转）。
   jingdong: ''
 };
-// 兜底：UNION_LINKS 留空时，用这里的【官方平台入口】(不带佣金、纯跳转官网，保证不报错)。
+// 兜底：UNION_LINKS 留空时，用这里的【官方平台入口】(纯跳转官网，保证不报错)。
 const PLATFORM_LINKS = {
   eleme:    'https://www.ele.me/',
   jingdong: 'https://www.jd.com/',
@@ -248,7 +248,7 @@ function initFooter() {
 
 function initCatalogLink() {
   const catalogBtn = document.getElementById('catalogBtn');
-  // 优先用联盟CPS链接（赚佣金），没有则隐藏
+  // 优先用已配置的推广链接，没有则隐藏
   const url = (UNION_LINKS.taobao || UNION_LINKS.jingdong || UNION_LINKS.eleme || "").trim();
 
   if (!url) {
@@ -280,7 +280,7 @@ function initPlatformButtons() {
     if (jingdongUrl) {
       bindSafeJump(jingdongBtn, () => buildJumpUrl(jingdongUrl, { platform: "jingdong", type: "platform" }));
     } else {
-      // 默认也允许作为普通直达使用，但不带任何“联盟”/“返利”字样
+      // 默认也允许作为普通直达使用，但不带任何“平台”/“返利”字样
       jingdongBtn.classList.add('disabled');
       jingdongBtn.disabled = true;
     }
@@ -615,12 +615,12 @@ function initResultModal() {
     if (e.key === "Escape") closeResultModal();
   });
 
-  // 弹窗按钮：🎟️ 领取外卖红包（点哪个平台就走哪个CPS链接，你赚佣金）
+  // 弹窗按钮：🎟️ 领取外卖红包
   const actionBtn = document.getElementById('modalActionBtn');
   actionBtn.addEventListener('click', () => {
     const firstUrl = getFirstUnionUrl();
     if (!firstUrl) {
-      showInfo("提示", "佣金入口尚未配置，请在 lunch/script.js 的 UNION_LINKS 填入你的联盟PID链接。");
+      showInfo("提示", "外卖红包入口正在准备中，请稍后再试。");
       return;
     }
     // 始终展示二维码：电脑上的访客用手机扫码即可领取（h5 唤端链接在电脑上无效）
@@ -669,7 +669,7 @@ function openResultModal(item) {
   modal.setAttribute("aria-hidden", "false");
   document.body.classList.add('modal-open');
 
-  // 展示联盟佣金入口（用户主动点哪个平台就走哪个CPS链接）
+  // 展示外卖红包入口（用户主动点击才跳转）
   setupUnionChooser();
   if (actionBtn) {
     actionBtn.textContent = "🎟️ 领取外卖红包";
@@ -677,12 +677,12 @@ function openResultModal(item) {
   }
 }
 
-// 在弹窗内渲染联盟平台按钮（有链接才显示）
+// 在弹窗内渲染平台平台按钮（有链接才显示）
 function setupUnionChooser() {
   const chooser = document.getElementById('unionChooser');
   if (!chooser) return;
   const map = { taobao: 'unionTaobao', jingdong: 'unionJd', eleme: 'unionEleme' };
-  const labels = { taobao: '🛒 淘宝联盟', jingdong: '📦 京东联盟', eleme: '🍔 饿了么联盟' };
+  const labels = { taobao: '🛒 淘宝闪购', jingdong: '📦 京东秒送', eleme: '🍔 饿了么' };
   let any = false;
   for (const k in map) {
     const a = document.getElementById(map[k]);
@@ -700,14 +700,14 @@ function setupUnionChooser() {
   chooser.style.display = any ? '' : 'none';
 }
 
-// 取第一个可用的联盟链接（淘宝优先）
+// 取第一个可用的推广链接（淘宝优先）
 function getFirstUnionUrl() {
-  // 优先用你自己的联盟链接（有佣金）
+  // 优先用已配置的推广链接
   for (const k of ['taobao', 'jingdong', 'eleme']) {
     const url = (UNION_LINKS[k] || '').trim();
     if (url) return url;
   }
-  // 兜底：联盟链接未配置时，跳官方平台入口（不带佣金，但保证能打开、不报错）
+  // 兜底：链接未配置时，跳官方平台入口（保证能打开、不报错）
   for (const k of ['eleme', 'jingdong', 'taobao']) {
     const url = (PLATFORM_LINKS[k] || '').trim();
     if (url) return url;
