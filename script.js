@@ -1,26 +1,26 @@
 // ==================== 外卖红包入口配置 ====================
-// 【重要】下面填平台后台生成的【带标识的推广链接】，这样入口才可使用。
+// 【重要】下面填平台后台生成的【带标识的入口链接】，这样入口才可使用。
 // 目前暂留空：未配置真实PID链接前，对应平台按钮自动隐藏，绝不跳转任何无关/他人链接。
 // 等你把三个真实链接发给我，我填进去即可上线。
 // 你的淘宝PID（仅核对用，真正用的是下方 taobao 字段里转链后的 s.click.taobao.com 链接）：
 // mm_15568142_3414250019_116269500058  （媒体：今天吃什么外卖大转盘）
 const UNION_LINKS = {
   // 说明（2026-09-19 更新）：
-  // 【淘宝闪购 / 饿了么】用户从「淘宝闪购 e起」点「淘宝推广」生成的推广链接。
+  // 【淘宝闪购 / 饿了么】从「淘宝闪购 e起」点「淘宝推广」生成的入口链接。
   //   饿了么已并入淘宝闪购（阿里系），两者共用同一条链接。
   //   链接类型为 h5 唤端链接：手机上点会唤起淘宝/支付宝里的小程序领红包；
   //   电脑上无法唤起，页面会同时展示二维码，可用手机支付宝扫。
   taobao:   'https://m.duanqu.com/?_ariver_appid=8251537&page=plugin-private%3A%2F%2F2021003183669766%2Fpages%2Fwh-coupon-guide%2Findex%3Fscene%3D572edc88a64f4fb79863637debb34934',
   // 饿了么：与 taobao 为同一条淘宝闪购链接（同一平台）。
   eleme:    'https://m.duanqu.com/?_ariver_appid=8251537&page=plugin-private%3A%2F%2F2021003183669766%2Fpages%2Fwh-coupon-guide%2Findex%3Fscene%3D572edc88a64f4fb79863637debb34934',
-  // 京东：京东属独立体系，需另行在京东平台（union.jd.com）生成自己的推广链接后填入。
+  // 京东：京东属独立体系，需另行在京东平台（union.jd.com）生成自己的入口链接后填入。
   // 留空 = 不跳任何来路不明链接；此时该入口走官方兜底（纯跳转）。
   jingdong: ''
 };
 // 兜底：UNION_LINKS 留空时，用这里的【官方平台入口】(纯跳转官网，保证不报错)。
 const PLATFORM_LINKS = {
   eleme:    'https://www.ele.me/',
-  jingdong: 'https://www.jd.com/',
+  jingdong: '',  // 用户 2026-09-21 定：暂无外卖链接，按钮隐藏，以后有链接再填
   taobao:   'https://www.taobao.com/'
 };
 // ====================================================
@@ -248,7 +248,7 @@ function initFooter() {
 
 function initCatalogLink() {
   const catalogBtn = document.getElementById('catalogBtn');
-  // 优先用已配置的推广链接，没有则隐藏
+  // 优先用已配置的入口链接，没有则隐藏
   const url = (UNION_LINKS.taobao || UNION_LINKS.jingdong || UNION_LINKS.eleme || "").trim();
 
   if (!url) {
@@ -280,8 +280,8 @@ function initPlatformButtons() {
     if (jingdongUrl) {
       bindSafeJump(jingdongBtn, () => buildJumpUrl(jingdongUrl, { platform: "jingdong", type: "platform" }));
     } else {
-      // 默认也允许作为普通直达使用，但不带任何“平台”/“返利”字样
-      jingdongBtn.classList.add('disabled');
+      // 默认也允许作为普通直达使用，但不带任何多余字样
+      jingdongBtn.style.display = 'none';  // 无链接时隐藏（用户 2026-09-21 定）
       jingdongBtn.disabled = true;
     }
   }
@@ -700,9 +700,9 @@ function setupUnionChooser() {
   chooser.style.display = any ? '' : 'none';
 }
 
-// 取第一个可用的推广链接（淘宝优先）
+// 取第一个可用的入口链接（淘宝优先）
 function getFirstUnionUrl() {
-  // 优先用已配置的推广链接
+  // 优先用已配置的入口链接
   for (const k of ['taobao', 'jingdong', 'eleme']) {
     const url = (UNION_LINKS[k] || '').trim();
     if (url) return url;
