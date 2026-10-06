@@ -5,14 +5,17 @@
 // 你的淘宝PID（仅核对用，真正用的是下方 taobao 字段里转链后的 s.click.taobao.com 链接）：
 // mm_15568142_3414250019_116269500058  （媒体：今天吃什么外卖大转盘）
 const UNION_LINKS = {
+  // 【2026-10-06 站检员核实】原来的淘宝闪购/饿了么限时活动入口链接已失效
+  //   （支付宝扫码提示「暂未找到该功能，请稍后再试」），已置空，改走下方官方平台入口。
+  //   拿到新的推广入口链接后再填回这里即可恢复。
   // 说明（2026-09-19 更新）：
   // 【淘宝闪购 / 饿了么】从「淘宝闪购 e起」点「淘宝推广」生成的入口链接。
   //   饿了么已并入淘宝闪购（阿里系），两者共用同一条链接。
   //   链接类型为 h5 唤端链接：手机上点会唤起淘宝/支付宝里的小程序领红包；
   //   电脑上无法唤起，页面会同时展示二维码，可用手机支付宝扫。
-  taobao:   'https://m.duanqu.com/?_ariver_appid=8251537&page=plugin-private%3A%2F%2F2021003183669766%2Fpages%2Fwh-coupon-guide%2Findex%3Fscene%3D572edc88a64f4fb79863637debb34934',
+  taobao:   '',
   // 饿了么：与 taobao 为同一条淘宝闪购链接（同一平台）。
-  eleme:    'https://m.duanqu.com/?_ariver_appid=8251537&page=plugin-private%3A%2F%2F2021003183669766%2Fpages%2Fwh-coupon-guide%2Findex%3Fscene%3D572edc88a64f4fb79863637debb34934',
+  eleme:    '',
   // 京东：京东属独立体系，需另行在京东平台（union.jd.com）生成自己的入口链接后填入。
   // 留空 = 不跳任何来路不明链接；此时该入口走官方兜底（纯跳转）。
   jingdong: ''
@@ -615,7 +618,7 @@ function initResultModal() {
     if (e.key === "Escape") closeResultModal();
   });
 
-  // 弹窗按钮：🎟️ 领取外卖红包
+  // 弹窗按钮：打开外卖平台
   const actionBtn = document.getElementById('modalActionBtn');
   actionBtn.addEventListener('click', () => {
     const firstUrl = getFirstUnionUrl();
@@ -642,7 +645,7 @@ function initResultModal() {
           qrBlock.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
       }, 120);
-      actionBtn.textContent = '👇 电脑上请用手机扫码领取';
+      actionBtn.textContent = '👇 电脑上请用手机扫码打开';
     }
   });
 
@@ -672,7 +675,7 @@ function openResultModal(item) {
   // 展示外卖红包入口（用户主动点击才跳转）
   setupUnionChooser();
   if (actionBtn) {
-    actionBtn.textContent = "🎟️ 领取外卖红包";
+    actionBtn.textContent = "🍔 打开饿了么";
     actionBtn.disabled = false;
   }
 }
@@ -718,7 +721,7 @@ function getFirstUnionUrl() {
 function closeResultModal() {
   if (autoJumpTimer) clearInterval(autoJumpTimer);
   const actionBtn = document.getElementById('modalActionBtn');
-  if (actionBtn) actionBtn.textContent = "🎟️ 立即查看外卖优惠";
+  if (actionBtn) actionBtn.textContent = "🍔 打开饿了么";
 
   const modal = document.getElementById('resultModal');
   modal.classList.remove('show');
