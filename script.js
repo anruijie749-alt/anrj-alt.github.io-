@@ -5,9 +5,9 @@
 // 你的淘宝PID（仅核对用，真正用的是下方 taobao 字段里转链后的 s.click.taobao.com 链接）：
 // mm_15568142_3414250019_116269500058  （媒体：今天吃什么外卖大转盘）
 const UNION_LINKS = {
-  // 外卖入口链接（2026-10-07：饿了么短链打开空白已失效，改为站内同一条可正常打开的入口）
-  taobao:   'https://uland.taobao.com/coupon/edetail?pid=mm_15568142_3414250019_116269500058',
-  eleme:    'https://uland.taobao.com/coupon/edetail?pid=mm_15568142_3414250019_116269500058',
+  // 外卖入口链接（2026-10-08：换成实测能打开的入口链；上一版只有PID的直链会打开空白页）
+  taobao:   'https://s.click.taobao.com/4jcI3ml',
+  eleme:    'https://s.click.taobao.com/4jcI3ml',
   jingdong: 'https://u.jd.com/RO6EzFn'
 };// 兜底：UNION_LINKS 留空时，用这里的【官方平台入口】(纯跳转官网，保证不报错)。
 const PLATFORM_LINKS = {
