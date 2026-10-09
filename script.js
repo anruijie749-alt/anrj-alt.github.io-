@@ -1,9 +1,5 @@
-// ==================== 外卖红包入口配置 ====================
-// 【重要】下面填平台后台生成的【带标识的入口链接】，这样入口才可使用。
-// 目前暂留空：未配置真实PID链接前，对应平台按钮自动隐藏，绝不跳转任何无关/他人链接。
-// 等你把三个真实链接发给我，我填进去即可上线。
-// 你的淘宝PID（仅核对用，真正用的是下方 taobao 字段里转链后的 s.click.taobao.com 链接）：
-// mm_15568142_3414250019_116269500058  （媒体：今天吃什么外卖大转盘）
+// ==================== 外卖红包入口链接 ====================
+// 访客点「领取外卖红包」时打开的活动入口（平台生成的入口链接，打开后可直接领红包、点外卖）。
 const UNION_LINKS = {
   // 外卖入口链接（2026-10-08：换成实测能打开的入口链；上一版只有PID的直链会打开空白页）
   taobao:   'https://s.click.taobao.com/4jcI3ml',
@@ -292,8 +288,9 @@ function bindSafeJump(el, urlOrFactory) {
       : urlOrFactory;
     if (url) el.setAttribute("href", url);
 
-    // 使用当前页面跳转，成功率 100%，不会被阻止
-    window.open(url, '_blank');  
+    // 新标签打开；若被浏览器拦截则退回当前页跳转，保证一定跳得出去
+    const w = window.open(url, '_blank');
+    if (!w) window.location.href = url;
 
     setTimeout(() => { jumpLock = false; }, 1500);
   }, { passive: false });
@@ -615,28 +612,30 @@ function initResultModal() {
       showInfo("提示", "外卖红包入口正在准备中，请稍后再试。");
       return;
     }
-    // 手机：直接跳转，不再展示二维码（少一步，体验更顺）
-    // 电脑：h5 唤端链接在电脑上无效，才展示二维码让访客用手机扫
-    const isMobile = /Android|iPhone|iPad|iPod|Mobile|HarmonyOS/i.test(navigator.userAgent);
-    if (isMobile) {
-      actionBtn.textContent = '正在打开…';
-      window.location.href = firstUrl;
-      return;
-    }
-    const qrBlock = document.getElementById('qrBlock');
-    if (qrBlock) {
-      qrBlock.style.display = 'block';
-      setTimeout(() => {
-        const mc = document.querySelector('#resultModal .modal-content');
-        if (mc && mc.scrollHeight > mc.clientHeight) {
-          mc.scrollTo({ top: mc.scrollHeight, behavior: 'smooth' });
-        } else if (qrBlock.scrollIntoView) {
-          qrBlock.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }
-      }, 120);
-      actionBtn.textContent = '👇 电脑上请用手机扫码领取';
-    }
+    // 2026-10-09 用户定：点「领取外卖红包」直接跳转到红包活动页，
+    // 手机、电脑都一样，不再先弹二维码。
+    actionBtn.textContent = '正在打开…';
+    window.location.href = firstUrl;
   });
+
+  // 电脑端万一打不开活动页，留一个不占地方的备用入口：点小字才显示二维码（默认不显示）
+  const qrBlock = document.getElementById('qrBlock');
+  if (qrBlock && !document.getElementById('qrToggleLink')) {
+    const p = document.createElement('p');
+    p.style.cssText = 'margin:14px 0 0; text-align:center;';
+    const a = document.createElement('a');
+    a.id = 'qrToggleLink';
+    a.href = 'javascript:void(0);';
+    a.textContent = '电脑上打不开？用手机扫码领 →';
+    a.style.cssText = 'font-size:13px; color:#888; text-decoration:underline;';
+    a.addEventListener('click', () => {
+      const show = (qrBlock.style.display !== 'block');
+      qrBlock.style.display = show ? 'block' : 'none';
+      a.textContent = show ? '收起二维码 ↑' : '电脑上打不开？用手机扫码领 →';
+    });
+    p.appendChild(a);
+    qrBlock.parentNode.insertBefore(p, qrBlock);
+  }
 
   // 弹窗按钮：换一个结果
   const againBtn = document.getElementById('modalAgainBtn');
