@@ -1,9 +1,10 @@
 // ==================== 外卖红包入口链接 ====================
 // 访客点「领取外卖红包」时打开的活动入口（平台生成的入口链接，打开后可直接领红包、点外卖）。
 const UNION_LINKS = {
-  // 外卖入口链接（2026-10-08：换成实测能打开的入口链；上一版只有PID的直链会打开空白页）
-  taobao:   'https://s.click.taobao.com/4jcI3ml',
-  eleme:    'https://s.click.taobao.com/4jcI3ml',
+  // 外卖入口链接（2026-10-10：换成「淘宝闪购·天天领红包(全场景通用)」推广链，2026-10-10 手机实点验证：直接进淘宝闪购外卖页、可领红包）
+  // 说明：这是唤端链，手机上点开直接进淘宝App；电脑上打开是空页，所以电脑端走二维码（见 showQrTip）
+  taobao:   'https://m.duanqu.com/?_ariver_appid=8251537&page=plugin-private%3A%2F%2F2021004134685665%2Fpages%2Ftaoke-guide%2Findex%3Ffrom%3Dminiapp.taobao%26channelInfo%3D%7B%22subSubChannel%22%3A%22miniapp.taobao.et%22%7D%26alsc_exsrc%3DES0006299852%26scene%3Dbd9b9628fa614f5495b8912626c47cfa',
+  eleme:    'https://m.duanqu.com/?_ariver_appid=8251537&page=plugin-private%3A%2F%2F2021004134685665%2Fpages%2Ftaoke-guide%2Findex%3Ffrom%3Dminiapp.taobao%26channelInfo%3D%7B%22subSubChannel%22%3A%22miniapp.taobao.et%22%7D%26alsc_exsrc%3DES0006299852%26scene%3Dbd9b9628fa614f5495b8912626c47cfa',
   jingdong: 'https://u.jd.com/RO6EzFn'
 };// 兜底：UNION_LINKS 留空时，用这里的【官方平台入口】(纯跳转官网，保证不报错)。
 const PLATFORM_LINKS = {
@@ -249,6 +250,17 @@ function initCatalogLink() {
 function initPlatformButtons() {
   document.querySelector('.platform-section').style.display = 'block';
   
+  // 微信内置浏览器可能拦淘宝App唤起：给访客一句提示（用户 2026-10-10 提）
+  (function addWechatTip() {
+    const sec = document.querySelector('.platform-section');
+    if (!sec || document.getElementById('wechatTip')) return;
+    const tip = document.createElement('p');
+    tip.id = 'wechatTip';
+    tip.style.cssText = 'margin:12px 0 0; font-size:13px; color:#888; line-height:1.8; text-align:center;';
+    tip.textContent = '提示：若在微信里点开没反应，请点右上角「···」→「在浏览器打开」，再点一次就能领红包。';
+    sec.appendChild(tip);
+  })();
+
   const elemeBtn = document.getElementById('elemeBtn');
   const jingdongBtn = document.getElementById('jingdongBtn');
 
@@ -275,6 +287,33 @@ function initPlatformButtons() {
   }
 }
 
+// 判断是不是手机（手机上点按钮直接进淘宝App；电脑上只能扫码）
+function isMobileDevice() {
+  const ua = navigator.userAgent || "";
+  const mobileUA = /Android|iPhone|iPad|iPod|Mobile|HarmonyOS|MicroMessenger/i.test(ua);
+  return mobileUA || (navigator.maxTouchPoints > 1 && window.innerWidth < 900);
+}
+
+// 电脑端弹二维码：外卖链是唤端链，电脑上打开是空页，所以让访客用手机淘宝扫
+function showQrTip() {
+  let ov = document.getElementById('qrTipOverlay');
+  if (!ov) {
+    ov = document.createElement('div');
+    ov.id = 'qrTipOverlay';
+    ov.style.cssText = 'position:fixed;left:0;top:0;right:0;bottom:0;background:rgba(0,0,0,0.55);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
+    ov.innerHTML = '<div style="background:#fff;border-radius:16px;padding:22px 20px;max-width:360px;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,0.25);">'
+      + '<p style="margin:0 0 12px;font-size:18px;font-weight:bold;color:#222;">🧧 领外卖红包</p>'
+      + '<img src="qr-hongbao.png" alt="外卖红包二维码" style="width:220px;height:220px;border-radius:12px;background:#fff;padding:8px;box-shadow:0 2px 10px rgba(0,0,0,0.08);">'
+      + '<p style="margin:14px 0 0;font-size:16px;color:#333;line-height:1.9;">电脑上请用<b>手机淘宝</b>扫这张码<br>手机上点按钮就能直接领</p>'
+      + '<p style="margin:12px 0 0;font-size:13px;color:#999;">点空白处关闭</p>'
+      + '</div>';
+    ov.addEventListener('click', function () { ov.style.display = 'none'; });
+    document.body.appendChild(ov);
+  } else {
+    ov.style.display = 'flex';
+  }
+}
+
 function bindSafeJump(el, urlOrFactory) {
   if (!el) return;
 
@@ -288,7 +327,14 @@ function bindSafeJump(el, urlOrFactory) {
       : urlOrFactory;
     if (url) el.setAttribute("href", url);
 
-    // 新标签打开；若被浏览器拦截则退回当前页跳转，保证一定跳得出去
+    // 电脑端：外卖链是唤端链，电脑上打开只有空页，所以不跳转，改成弹二维码让访客用手机扫
+    if (!isMobileDevice()) {
+      showQrTip();
+      setTimeout(() => { jumpLock = false; }, 600);
+      return;
+    }
+
+    // 手机端：新标签打开；若被浏览器拦截则退回当前页跳转，保证一定跳得出去
     const w = window.open(url, '_blank');
     if (!w) window.location.href = url;
 
@@ -612,8 +658,12 @@ function initResultModal() {
       showInfo("提示", "外卖红包入口正在准备中，请稍后再试。");
       return;
     }
-    // 2026-10-09 用户定：点「领取外卖红包」直接跳转到红包活动页，
-    // 手机、电脑都一样，不再先弹二维码。
+    // 2026-10-09 用户定：点「领取外卖红包」直接跳转到红包活动页，不再先弹二维码。
+    // 2026-10-10 补：新入口链是"唤端链"，电脑上打开只有空页 —— 所以手机端照旧直跳，电脑端改成弹二维码（扫码领）。
+    if (!isMobileDevice()) {
+      showQrTip();
+      return;
+    }
     actionBtn.textContent = '正在打开…';
     window.location.href = firstUrl;
   });
@@ -672,8 +722,10 @@ function openResultModal(item) {
 function setupUnionChooser() {
   const chooser = document.getElementById('unionChooser');
   if (!chooser) return;
-  const map = { taobao: 'unionTaobao', jingdong: 'unionJd', eleme: 'unionEleme' };
-  const labels = { taobao: '🛒 淘宝闪购', jingdong: '📦 京东秒送', eleme: '🍔 饿了么' };
+  const map = { taobao: 'unionTaobao', jingdong: 'unionJd' };   // 2026-10-10：饿了么已并入淘宝闪购，且指向同一条链，去掉重复入口
+  const labels = { taobao: '🛒 淘宝闪购', jingdong: '📦 京东秒送' };
+  const elemeOld = document.getElementById('unionEleme');
+  if (elemeOld) elemeOld.style.display = 'none';
   let any = false;
   for (const k in map) {
     const a = document.getElementById(map[k]);
